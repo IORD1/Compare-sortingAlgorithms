@@ -50,141 +50,283 @@ void bubbleSort()
             for(int i=0; i<values.size() ;i++){                 //now the nums[] array is sorted so make it 
                 nums[i] = copy[i];                              //unsorted coping numbers from copy array
             }                                                   //to nums array.
-        }
-    cout<<values.size()<<endl;              //printing size of values array just for debugging
-    cout<<n<<endl;                          //ans also n
+        }                        
     int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    //taking average
     cout<<"Average time for Bubble sort : "<<avgtime<<endl;                         //printing average
-
+    cout<<"-------------------------------------------------"<<endl;
 }
 
-
+void swapping(int &a, int &b) {         //swap the content of a and b
+   int temp;
+   temp = a;
+   a = b;
+   b = temp;
+}
 //selectionsort.....
-void SelectionSort(int arr[], int n)
-{
-    int i, j, min_ind;
-    for(i=0;i<n-1;i++)
+void SelectionSort() {
+    int avgarray[3] = {0};
+    int nums[values.size()] = {0};
+    int copy[values.size()] = {0};
+    for(int i=0; i<values.size(); i++){
+        nums[i] = values[i];        
+        copy[i] = values[i];       
+    }
+
+    int n = values.size();
+    for (int k = 0; k < 3; k++)
     {
-        i=min_ind;
-        for(j=i+1;j<n;j++)
+        int i, j, min_in;
+        auto start = high_resolution_clock::now();
+        for (i = 0; i < n; i++)
         {
-            if(arr[j]<arr[min_ind])
-                min_ind=j;
-            swap(&arr[min_ind],&arr[i]);
+            min_in = i;
+            for (j = i + 1; j < n; j++){
+                if (nums[j] < nums[min_in]){
+                    min_in = j;
+                }
+            }
+            swap(nums[i], nums[min_in]);
+        }
+        auto stop = high_resolution_clock::now();                  
+        auto duration = duration_cast<microseconds>(stop - start); 
+        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        avgarray[k] = duration.count();                                      
+
+        for (int t = 0; t < values.size(); t++)
+        {                      
+            nums[t] = copy[t]; 
         }
     }
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    cout<<"Average time for Selection sort : "<<avgtime<<endl; 
+     cout<<"-------------------------------------------------"<<endl;
 }
 
 //insertionsort
-void Insertionsort(int arr[],int n)
+void Insertionsort()
 {
- int i,key,j;
- for(i=1;i<n;i++)
- {
-     key=arr[i];
-     j=i-1;
-     while(j>=0 && arr[j]>key)
-     {
-         arr[j+1]=arr[j];
-         j=j-1;
-     }
-     arr[j+1]=key;
- }
+    int avgarray[3] = {0};
+    int nums[values.size()] = {0};
+    int copy[values.size()] = {0};
+    for (int d = 0; d < values.size(); d++)
+    {
+        nums[d] = values[d];
+        copy[d] = values[d];
+    }
+
+    int n = values.size();
+    for (int k = 0; k < 3; k++)
+    {
+        int i, key, j;
+        auto start = high_resolution_clock::now();
+        for (i = 1; i < n; i++)
+        {
+            key = nums[i];
+            j = i - 1;
+            while (j >= 0 && nums[j] > key)
+            {
+                nums[j + 1] = nums[j];
+                j = j - 1;
+            }
+            nums[j + 1] = key;
+        }
+        auto stop = high_resolution_clock::now();                  
+        auto duration = duration_cast<microseconds>(stop - start); 
+        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        avgarray[k] = duration.count();                                      
+
+        for (int t = 0; t < values.size(); t++)
+        {                      
+            nums[t] = copy[t]; 
+        }
+    }
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    cout<<"Average time for Insertion sort : "<<avgtime<<endl; 
+     cout<<"-------------------------------------------------"<<endl;
 }
 
-//mergesort
-void MergeSort(int arr[],int left,int right,int temp)
+
+
+//>>>>>>>>>>>>>>>>>>>>>>>>MERGE SORT FUNCTION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+void merge(int array[], int const left, int const mid, int const right)
 {
-    int mid;
-    if(left<right)
-    {
-        mid=(left+right)/2;
-        MergeSort(arr,left,mid,temp);
-        MergeSort(arr,mid+1,right,temp);
-   //     Merge(arr,left,mid+1,temp,right);
+    auto const subArrayOne = mid - left + 1;
+    auto const subArrayTwo = right - mid;
+  
+    // Create temp arrays
+    auto *leftArray = new int[subArrayOne],
+         *rightArray = new int[subArrayTwo];
+  
+    // Copy data to temp arrays leftArray[] and rightArray[]
+    for (auto i = 0; i < subArrayOne; i++)
+        leftArray[i] = array[left + i];
+    for (auto j = 0; j < subArrayTwo; j++)
+        rightArray[j] = array[mid + 1 + j];
+  
+    auto indexOfSubArrayOne = 0, // Initial index of first sub-array
+        indexOfSubArrayTwo = 0; // Initial index of second sub-array
+    int indexOfMergedArray = left; // Initial index of merged array
+  
+    // Merge the temp arrays back into array[left..right]
+    while (indexOfSubArrayOne < subArrayOne && indexOfSubArrayTwo < subArrayTwo) {
+        if (leftArray[indexOfSubArrayOne] <= rightArray[indexOfSubArrayTwo]) {
+            array[indexOfMergedArray] = leftArray[indexOfSubArrayOne];
+            indexOfSubArrayOne++;
+        }
+        else {
+            array[indexOfMergedArray] = rightArray[indexOfSubArrayTwo];
+            indexOfSubArrayTwo++;
+        }
+        indexOfMergedArray++;
     }
+    // Copy the remaining elements of
+    // left[], if there are any
+    while (indexOfSubArrayOne < subArrayOne) {
+        array[indexOfMergedArray] = leftArray[indexOfSubArrayOne];
+        indexOfSubArrayOne++;
+        indexOfMergedArray++;
+    }
+    // Copy the remaining elements of
+    // right[], if there are any
+    while (indexOfSubArrayTwo < subArrayTwo) {
+        array[indexOfMergedArray] = rightArray[indexOfSubArrayTwo];
+        indexOfSubArrayTwo++;
+        indexOfMergedArray++;
+    }
+}
+void mergeSort(int array[], int const begin, int const end)
+{
+    if (begin >= end)
+        return; // Returns recursively
+  
+    auto mid = begin + (end - begin) / 2;
+    mergeSort(array, begin, mid);
+    mergeSort(array, mid + 1, end);
+    merge(array, begin, mid, end);
 
 }
-void Merge(int arr[],int left,int mid,int temp[],int right)
-{
 
-    int i=left;
-    int j=mid+1;
-    int k=left;
-    while(i<=mid && j<=right)
+
+void mergemain(){
+
+    int avgarray[3] = {0};
+    int nums[values.size()] = {0};
+    int copy[values.size()] = {0};
+    for (int d = 0; d < values.size(); d++)
     {
-
-        if(arr[i]<arr[j])
-        {
-           temp[k]=arr[i];
-           i++;
-
-        }
-        else{
-            temp[k]=arr[j];
-            j++;
-        }
-        k++;
+        nums[d] = values[d];
+        copy[d] = values[d];
     }
-    if(i>mid){
-        while(j<right)
-        {
 
-            temp[k]=arr[j];
-            k++;
-            j++;
+    int n = values.size();
+    for (int k = 0; k < 3; k++)
+    {
+        auto start = high_resolution_clock::now();
+        mergeSort(nums, 0 , n);
+        auto stop = high_resolution_clock::now();                  
+        auto duration = duration_cast<microseconds>(stop - start); 
+        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        avgarray[k] = duration.count();
+        for (int t = 0; t < values.size(); t++)
+        {                      
+            nums[t] = copy[t]; 
         }
     }
-    else{
-        while(i<=mid)
-        {
-            temp[k]=arr[i];
-            k++;
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    cout<<"Average time for Merge sort : "<<avgtime<<endl; 
+    cout<<"-------------------------------------------------"<<endl;
+
+}
+
+//>>>>>>>>>>>>>>>>>>>>>>>>QUICK SORT FUNCTION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+int partition(int arr[], int start, int end)
+{
+ 
+    int pivot = arr[start];
+ 
+    int count = 0;
+    for (int i = start + 1; i <= end; i++) {
+        if (arr[i] <= pivot)
+            count++;
+    }
+ 
+    // Giving pivot element its correct position
+    int pivotIndex = start + count;
+    swap(arr[pivotIndex], arr[start]);
+ 
+    // Sorting left and right parts of the pivot element
+    int i = start, j = end;
+ 
+    while (i < pivotIndex && j > pivotIndex) {
+ 
+        while (arr[i] <= pivot) {
             i++;
         }
+ 
+        while (arr[j] > pivot) {
+            j--;
+        }
+ 
+        if (i < pivotIndex && j > pivotIndex) {
+            swap(arr[i++], arr[j--]);
+        }
     }
-    for(k=left; k<=right; k++)
-    {
-        arr[k]=temp[k];
-    }
+ 
+    return pivotIndex;
+}
+ 
+void quickSort(int arr[], int start, int end)
+{
+ 
+    // base case
+    if (start >= end)
+        return;
+ 
+    // partitioning the array
+    int p = partition(arr, start, end);
+ 
+    // Sorting the left part
+    quickSort(arr, start, p - 1);
+ 
+    // Sorting the right part
+    quickSort(arr, p + 1, end);
 }
 
+void quicksortmain(){
+    int avgarray[3] = {0};
+    int nums[values.size()] = {0};
+    int copy[values.size()] = {0};
+    for (int d = 0; d < values.size(); d++)
+    {
+        nums[d] = values[d];
+        copy[d] = values[d];
+    }
 
-//quicksort
-// void Quicksort(int arr[],int low, int high,int Partition())
-// {
-//     int pivot;
-//     if(low<high)
-//     {
-//         pivot= Partition(arr,low,high);
-//         Quicksort(arr,low,pivot-1);
-//         Quicksort(arr,pivot+1,high);
-//     }
-// }
+    int n = values.size();
+    for (int k = 0; k < 3; k++)
+    {
+        auto start = high_resolution_clock::now();
+        for(int g=0; g<n; g++){
+            cout<<nums[g]<<"-";
+        }cout<<endl;
+        quickSort(nums, 0 , n);
+        auto stop = high_resolution_clock::now();                  
+        auto duration = duration_cast<microseconds>(stop - start); 
+        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        avgarray[k] = duration.count();                                      
 
-// int Partition(int arr,int low, int high)
-// {
-//     int i=low;
-//     int j=high;
-//     int Pivot=arr[low];
-//     while(low<high){
-//         while(arr[i]<=Pivot)
-//         {
-//             i++;
-//         }
-//         while(arr[j]>Pivot)
-//         {
-//             j--;
-//         }
-//         if(i<j)
-//         {
-//             swap2(arr,i,j);
-//         }
-//     }
-//     swap2(arr,j,low);
-//     return j;
-
-// }
+        for(int g=0; g<n; g++){
+            cout<<nums[g]<<"-";
+        }cout<<endl;
+        for (int t = 0; t < values.size(); t++)
+        {                      
+            nums[t] = copy[t]; 
+        }
+    }
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    cout<<"Average time for Quick sort : "<<avgtime<<endl; 
+    cout<<"-------------------------------------------------"<<endl;
+}
 
 
 
@@ -298,11 +440,11 @@ void opt2menu(vector<string> algoptoins){
         if(algolist[i] == 1){
             bubbleSort();       //calling bubblesort here
         }else if(algolist[i] == 2){
-            cout<<"ruk re bhai Selection Sort hone ka hai function "<<endl;
+            SelectionSort();
         }else if(algolist[i] == 3){
-            cout<<"ruk re bhai insertion sort hone ka hai function "<<endl;
+            Insertionsort();
         }else if(algolist[i] == 4){
-            cout<<"ruk re bhai merge sort hone ka hai function "<<endl;
+            mergemain();
         }else if(algolist[i] == 5){
             cout<<"ruk re bhai quick sort hone ka hai function "<<endl;
         }else if(algolist[i] == 6){
