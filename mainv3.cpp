@@ -278,17 +278,14 @@ int partition(int arr[], int start, int end)
 void quickSort(int arr[], int start, int end)
 {
  
-    // base case
+
     if (start >= end)
         return;
  
-    // partitioning the array
+
     int p = partition(arr, start, end);
- 
-    // Sorting the left part
+
     quickSort(arr, start, p - 1);
- 
-    // Sorting the right part
     quickSort(arr, p + 1, end);
 }
 
@@ -324,39 +321,39 @@ void quicksortmain(){
 //>>>>>>>>>>>>>>>>>>>>>>>>HEAP SORT FUNCTION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 void heapify(int arr[], int n, int i)
 {
-    int largest = i; // Initialize largest as root
+    int largest = i; 
     int l = 2 * i + 1; // left = 2*i + 1
     int r = 2 * i + 2; // right = 2*i + 2
   
-    // If left child is larger than root
+
     if (l < n && arr[l] > arr[largest])
         largest = l;
   
-    // If right child is larger than largest so far
+
     if (r < n && arr[r] > arr[largest])
         largest = r;
   
-    // If largest is not root
+
     if (largest != i) {
         swap(arr[i], arr[largest]);
   
-        // Recursively heapify the affected sub-tree
+  
         heapify(arr, n, largest);
     }
 }
 
 void heapSort(int arr[], int n)
 {
-    // Build heap (rearrange array)
+   
     for (int i = n / 2 - 1; i >= 0; i--)
         heapify(arr, n, i);
   
-    // One by one extract an element from heap
+
     for (int i = n - 1; i >= 0; i--) {
         // Move current root to end
         swap(arr[0], arr[i]);
   
-        // call max heapify on the reduced heap
+
         heapify(arr, i, 0);
     }
 }
@@ -389,25 +386,23 @@ void heapsortmain(){
     cout<<"Average time for Heap sort : "<<avgtime<<endl; 
     cout<<"-------------------------------------------------"<<endl;
 }
-//>>>>>>>>>>>>>>>>>>>>>>>>HEAP SORT FUNCTION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//>>>>>>>>>>>>>>>>>>>>>>>>BUCKET SORT FUNCTION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 void bucketSort(float arr[], int n)
 {
      
-    // 1) Create n empty buckets
+
     vector<float> b[n];
  
-    // 2) Put array elements
-    // in different buckets
+
     for (int i = 0; i < n; i++) {
         int bi = n * arr[i]; // Index in bucket
         b[bi].push_back(arr[i]);
     }
- 
-    // 3) Sort individual buckets
+
     for (int i = 0; i < n; i++)
         sort(b[i].begin(), b[i].end());
  
-    // 4) Concatenate all buckets into arr[]
+
     int index = 0;
     for (int i = 0; i < n; i++)
         for (int j = 0; j < b[i].size(); j++)
@@ -456,43 +451,33 @@ int getMax(int arr[], int n)
     return mx;
 }
 
-
-// A function to do counting sort of arr[] according to
-// the digit represented by exp.
 void countSort(int arr[], int n, int exp)
 {
     int output[n]; // output array
     int i, count[10] = { 0 };
  
-    // Store count of occurrences in count[]
+
     for (i = 0; i < n; i++)
         count[(arr[i] / exp) % 10]++;
  
-    // Change count[i] so that count[i] now contains actual
-    //  position of this digit in output[]
+
     for (i = 1; i < 10; i++)
         count[i] += count[i - 1];
  
-    // Build the output array
+
     for (i = n - 1; i >= 0; i--) {
         output[count[(arr[i] / exp) % 10] - 1] = arr[i];
         count[(arr[i] / exp) % 10]--;
     }
  
-    // Copy the output array to arr[], so that arr[] now
-    // contains sorted numbers according to current digit
     for (i = 0; i < n; i++)
         arr[i] = output[i];
 }
 
 void radixsort(int arr[], int n)
 {
-    // Find the maximum number to know number of digits
     int m = getMax(arr, n);
  
-    // Do counting sort for every digit. Note that instead
-    // of passing digit number, exp is passed. exp is 10^i
-    // where i is current digit number
     for (int exp = 1; m / exp > 0; exp *= 10)
         countSort(arr, n, exp);
 }
@@ -510,18 +495,11 @@ void radixmain(){
     for (int k = 0; k < 3; k++)
     {
         auto start = high_resolution_clock::now();
-        for(int g=0; g<n; g++){
-            cout<<nums[g]<<"-";
-        }cout<<endl;
         radixsort(nums, n);
         auto stop = high_resolution_clock::now();                  
         auto duration = duration_cast<microseconds>(stop - start); 
         cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
-        avgarray[k] = duration.count();                                      
-
-        for(int g=0; g<n; g++){
-            cout<<nums[g]<<"-";
-        }cout<<endl;
+        avgarray[k] = duration.count();  
         for (int t = 0; t < values.size(); t++)
         {                      
             nums[t] = copy[t]; 
@@ -534,9 +512,8 @@ void radixmain(){
 
 //>>>>>>>>>>>>>>>>>>>>>>>>TIM SORT FUNCTION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-// This function sorts array from left index to
-// to right index which is of size atmost RUN
-void insertionSort(int arr[], int left, int right)
+
+void insertionSorttim(int arr[], int left, int right)
 {
     for (int i = left + 1; i <= right; i++)
     {
@@ -552,11 +529,9 @@ void insertionSort(int arr[], int left, int right)
 }
  
 // Merge function merges the sorted runs
-void merge(int arr[], int l, int m, int r)
+void mergetim(int arr[], int l, int m, int r)
 {
      
-    // Original array is broken in two parts
-    // left and right array
     int len1 = m - l + 1, len2 = r - m;
     int left[len1], right[len2];
     for (int i = 0; i < len1; i++)
@@ -568,9 +543,6 @@ void merge(int arr[], int l, int m, int r)
     int j = 0;
     int k = l;
  
-    // After comparing, we
-    // merge those two array
-    // in larger sub array
     while (i < len1 && j < len2)
     {
         if (left[i] <= right[j])
@@ -603,62 +575,31 @@ void merge(int arr[], int l, int m, int r)
     }
 }
  
-// Iterative Timsort function to sort the
-// array[0...n-1] (similar to merge sort)
 void timSort(int arr[], int n)
 {
      
     // Sort individual subarrays of size RUN
     for (int i = 0; i < n; i+=RUN)
-        insertionSort(arr, i, min((i+RUN-1),
+        insertionSorttim(arr, i, min((i+RUN-1),
                                     (n-1)));
  
-    // Start merging from size RUN (or 32).
-    // It will merge
-    // to form size 64, then 128, 256
-    // and so on ....
+    
     for (int size = RUN; size < n;
                              size = 2*size)
     {
-         
-        // pick starting point of
-        // left sub array. We
-        // are going to merge
-        // arr[left..left+size-1]
-        // and arr[left+size, left+2*size-1]
-        // After every merge, we
-        // increase left by 2*size
         for (int left = 0; left < n;
                              left += 2*size)
         {
-             
-            // find ending point of
-            // left sub array
-            // mid+1 is starting point
-            // of right sub array
             int mid = left + size - 1;
             int right = min((left + 2*size - 1),
                                             (n-1));
- 
-            // merge sub array arr[left.....mid] &
-            // arr[mid+1....right]
               if(mid < right)
-                merge(arr, left, mid, right);
+                mergetim(arr, left, mid, right);
         }
     }
 }
- 
+
 void timmain(){
-    // Find the maximum number to know number of digits
-    int m = getMax(arr, n);
- 
-    // Do counting sort for every digit. Note that instead
-    // of passing digit number, exp is passed. exp is 10^i
-    // where i is current digit number
-    for (int exp = 1; m / exp > 0; exp *= 10)
-        countSort(arr, n, exp);
-}
-void radixmain(){
     int avgarray[3] = {0};
     int nums[values.size()] = {0};
     int copy[values.size()] = {0};
@@ -672,18 +613,11 @@ void radixmain(){
     for (int k = 0; k < 3; k++)
     {
         auto start = high_resolution_clock::now();
-        for(int g=0; g<n; g++){
-            cout<<nums[g]<<"-";
-        }cout<<endl;
         timSort(nums, n);
         auto stop = high_resolution_clock::now();                  
         auto duration = duration_cast<microseconds>(stop - start); 
         cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
-        avgarray[k] = duration.count();                                      
-
-        for(int g=0; g<n; g++){
-            cout<<nums[g]<<"-";
-        }cout<<endl;
+        avgarray[k] = duration.count();
         for (int t = 0; t < values.size(); t++)
         {                      
             nums[t] = copy[t]; 
@@ -691,8 +625,61 @@ void radixmain(){
     }
     int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
     cout<<"Average time for Tim sort : "<<avgtime<<endl; 
-    cout<<"-------------------------------------------------"<<endl;  
+    cout<<"-------------------------------------------------"<<endl;
 }
+
+
+//>>>>>>>>>>>>>>>>>>>>>>>>SHELL SORT FUNCTION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+int shellSort(int arr[], int n)
+{
+    // Start with a big gap, then reduce the gap
+    for (int gap = n/2; gap > 0; gap /= 2)
+    {
+        for (int i = gap; i < n; i += 1)
+        {
+            int temp = arr[i];
+            int j;           
+            for (j = i; j >= gap && arr[j - gap] > temp; j -= gap)
+                arr[j] = arr[j - gap];
+            arr[j] = temp;
+        }
+    }
+    return 0;
+}
+
+void shellmain(){
+    int avgarray[3] = {0};
+    int nums[values.size()] = {0};
+    int copy[values.size()] = {0};
+    for (int d = 0; d < values.size(); d++)
+    {
+        nums[d] = values[d];
+        copy[d] = values[d];
+    }
+
+    int n = values.size();
+    for (int k = 0; k < 3; k++)
+    {
+        auto start = high_resolution_clock::now();
+        shellSort(nums, n);
+        auto stop = high_resolution_clock::now();                  
+        auto duration = duration_cast<microseconds>(stop - start); 
+        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        avgarray[k] = duration.count(); 
+        for (int t = 0; t < values.size(); t++)
+        {                      
+            nums[t] = copy[t]; 
+        }
+    }
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    cout<<"Average time for Shell sort : "<<avgtime<<endl; 
+    cout<<"-------------------------------------------------"<<endl;   
+} 
+
+//>>>>>>>>>>>>>>>>>>>>>>>>ALgo's END<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
 
 
 void opt3menu(){
@@ -819,9 +806,9 @@ void opt2menu(vector<string> algoptoins){
         }else if(algolist[i] == 8){
             radixmain();
         }else if(algolist[i] == 9){
-            cout<<"ruk re bhai tme sort hone ka hai function "<<endl;
+            timmain();
         }else if(algolist[i] == 10){
-            cout<<"ruk re bhai shell sort hone ka hai function "<<endl;
+            shellmain();
         }else{
             cout<<"Bhai kuch gad bad hai is me "<<endl;
         }
@@ -842,6 +829,23 @@ void printmenu(){//for priting the menu
     cout<<"-----------------------------------"<<endl;
 }
 
+
+void printinfo(){
+    cout<<"Average Time complexities of different Sorting techniques"<<endl;
+    cout<<"Bubble sort :    O(n2) "<<endl;
+    cout<<"Selection sort : O(n2) "<<endl;
+    cout<<"Insertion sort : O(n2) "<<endl;
+    cout<<"Merge sort :     O(n*Log n) "<<endl;
+    cout<<"Quick sort :     O(n*Log n) "<<endl;
+    cout<<"Heap sort :      O(n*Log n) "<<endl;
+    cout<<"Bucket sort :    O(n) "<<endl;
+    cout<<"Radix sort :     O(D*(n+b)) "<<endl;
+    cout<<"Tim sort :       O(nlog n) "<<endl;
+    cout<<"Shell sort :     O(nlog n) "<<endl;
+    cout<<"where n = size of array "<<endl;;
+    cout<<"      b = base"<<endl;
+    cout<<"-----------------------------------"<<endl;
+}
 // >>>>>>>>>>>>>>>>>>MAIN<<<<<<<<<<<<<<<<<<<<
 
 int main(){
@@ -851,10 +855,7 @@ int main(){
     auto f = []() -> int { return rand() % 1000; };
     generate(values.begin(), values.end(), f);
 
-    //bubbleSort(valuesarr,sizeofarray);
-    // for(int i=0; i<values.size(); i++){
-    //     cout<<valuesarr[i]<<" ";
-    // }
+
 
     system("clear");
     printmenu();
@@ -882,7 +883,7 @@ int main(){
         }else if(opt == 4){
             system("clear");
             printmenu();
-            cout<<"Info"<<endl;
+            printinfo();
         }else if(opt == 5){
             system("clear");
             printmenu();
