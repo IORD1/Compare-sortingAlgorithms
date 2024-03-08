@@ -5,13 +5,15 @@
 #include<fstream>//for file handeling
 #include<conio.h>//for clearing terminal
 #include<array>
+#include<omp.h>
+#include <bits/stdc++.h> 
 using namespace std;
 using namespace std::chrono;
 vector<int> algolist;
 vector<int> values(1000);
 const int RUN = 32;
 
-
+//>>>>>>>>>>>>>>>>>>>>>>>>BUBBLE SORT FUNCTION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 void swap(int *xp, int *yp)//fuction needed for bubble sort
 {
     int temp = *xp;
@@ -44,16 +46,81 @@ void bubbleSort()
             auto stop = high_resolution_clock::now();   //clock stoped <<<<<<<<
             auto duration = duration_cast<microseconds>(stop - start);  //stroreing the time taken in duration (stop - start)
 
-	        cout << "Time taken by function: "<< duration.count() << " microseconds" << endl; //printing the time each time 
+	        // cout << "Time taken by function: "<< duration.count() << " microseconds" << endl; //printing the time each time 
             avgarray[k] = duration.count();                     //stroing the time in our array to take average later
 
             for(int i=0; i<values.size() ;i++){                 //now the nums[] array is sorted so make it 
                 nums[i] = copy[i];                              //unsorted coping numbers from copy array
             }                                                   //to nums array.
         }                        
-    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    //taking average
-    cout<<"Average time for Bubble sort : "<<avgtime<<endl;                         //printing average
-    cout<<"-------------------------------------------------"<<endl;
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;  
+    cout<<"--------------------------------------------------"<<endl; 
+    cout<<"BUBBLE SORT--------------------------------------|"<<endl;
+    cout<<"|Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;
+    cout<<"|Average time : "<<avgtime<<endl;                   
+    cout<<"|                                                |"<<endl;
+}
+void llswap(int &a, int &b)
+{
+
+    int test;
+    test=a;
+    a=b;
+    b=test;
+
+}
+
+void parrallelBubbleSort()           
+{
+    int avgarray[3] = {0};//decalring the array of size 3 to store the time of each round
+    int nums[values.size()] = {0};//declaring the array that is going to get sorted
+    int copy[values.size()] = {0};//declaring the copy[] array to copy random numbers to nums[] array after sorting for next loop 
+    for(int i=0; i<values.size(); i++){
+        nums[i] = values[i];        //coping random numbers form values array to nums array
+        copy[i] = values[i];        //coping random number form values array to copy array
+    }
+    
+    int n = values.size();
+
+
+        for(int k=0; k<3; k++){         //we are going to sort the nums array three times so k = 3 and takes it's average
+            int i, j;
+            auto start = high_resolution_clock::now();  //clock started <<<<<<
+            // for (i = 0; i < n-1; i++){                  //bubble sort algo
+            //     for (j = 0; j < n-i-1; j++){
+            //         if (nums[j] > nums[j+1]){
+            //             swap(&nums[j], &nums[j+1]);//declared abhove
+            //         }
+            //     }
+            // }
+            for(  int i = 0;  i < n;  i++ )
+            {  	 
+                int first = i % 2; 	 
+
+                #pragma omp parallel for shared(nums,first)
+                for(  int j = first;  j < n-1;  j += 2  )
+                {  	 
+                    if(  nums[ j ]  >  nums[ j+1 ]  )
+                    {  	 
+                            llswap(  nums[ j ],  nums[ j+1 ]  );
+                    }  	 
+                    }  	 
+            }
+            auto stop = high_resolution_clock::now();   //clock stoped <<<<<<<<
+            auto duration = duration_cast<microseconds>(stop - start);  //stroreing the time taken in duration (stop - start)
+
+	        // cout << "Time taken by function: "<< duration.count() << " microseconds" << endl; //printing the time each time 
+            avgarray[k] = duration.count();                     //stroing the time in our array to take average later
+
+            for(int i=0; i<values.size() ;i++){                 //now the nums[] array is sorted so make it 
+                nums[i] = copy[i];                              //unsorted coping numbers from copy array
+            }                                                   //to nums array.
+        }                        
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3; 
+    cout<<"BUBBLE SORT PARRALLEL                            |"<<endl;
+    cout<<"|Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;
+    cout<<"|Average time : "<<avgtime<<endl;                   
+    cout<<"|________________________________________________|"<<endl;
 }
 
 void swapping(int &a, int &b) {         //swap the content of a and b
@@ -62,7 +129,11 @@ void swapping(int &a, int &b) {         //swap the content of a and b
    a = b;
    b = temp;
 }
-//selectionsort.....
+//>>>>>>>>>>>>>>>>>>>>>>>>SELECTION SORT FUNCTION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+struct Compare { int val; int index; };
+#pragma omp declare reduction(maximum : struct Compare : omp_out = omp_in.val > omp_out.val ? omp_in : omp_out)
+
+
 void SelectionSort() {
     int avgarray[3] = {0};
     int nums[values.size()] = {0};
@@ -89,7 +160,7 @@ void SelectionSort() {
         }
         auto stop = high_resolution_clock::now();                  
         auto duration = duration_cast<microseconds>(stop - start); 
-        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        // cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
         avgarray[k] = duration.count();                                      
 
         for (int t = 0; t < values.size(); t++)
@@ -97,12 +168,74 @@ void SelectionSort() {
             nums[t] = copy[t]; 
         }
     }
-    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
-    cout<<"Average time for Selection sort : "<<avgtime<<endl; 
-     cout<<"-------------------------------------------------"<<endl;
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3; 
+    cout<<"--------------------------------------------------"<<endl;  
+    cout<<"SELECTION SORT-----------------------------------|"<<endl;
+    cout<<"|Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;
+    cout<<"|Average time : "<<avgtime<<endl;                   
+    cout<<"|                                                |"<<endl;
 }
 
-//insertionsort
+void parrallelSelectionSort() {
+    int avgarray[3] = {0};
+    int nums[values.size()] = {0};
+    int copy[values.size()] = {0};
+    for(int i=0; i<values.size(); i++){
+        nums[i] = values[i];        
+        copy[i] = values[i];       
+    }
+
+    int n = values.size();
+    for (int k = 0; k < 3; k++)
+    {
+        int i, j, min_in;
+        auto start = high_resolution_clock::now();
+        // for (i = 0; i < n; i++)
+        // {
+        //     min_in = i;
+        //     for (j = i + 1; j < n; j++){
+        //         if (nums[j] < nums[min_in]){
+        //             min_in = j;
+        //         }
+        //     }
+        //     swap(nums[i], nums[min_in]);
+        // }
+        for (int i = n - 1; i > 0; --i)
+        {
+            struct Compare max;
+            max.val = nums[i];
+            max.index = i;
+            #pragma omp parallel for reduction(maximum:max)
+            for (int j = i - 1; j >= 0; --j)
+            {
+                if (nums[j] > max.val)
+                {
+                    max.val = nums[j];
+                    max.index = j;
+                }
+            }
+            int tmp = nums[i];
+            nums[i] = max.val;
+            nums[max.index] = tmp;
+        }
+        auto stop = high_resolution_clock::now();                  
+        auto duration = duration_cast<microseconds>(stop - start); 
+        // cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        avgarray[k] = duration.count();                                      
+
+        for (int t = 0; t < values.size(); t++)
+        {                      
+            nums[t] = copy[t]; 
+        }
+    }
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3; 
+    cout<<"SELECTION SORT PARRALLEL                         |"<<endl;
+    cout<<"|Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;
+    cout<<"|Average time : "<<avgtime<<endl;                   
+    cout<<"|________________________________________________|"<<endl;
+}
+
+//>>>>>>>>>>>>>>>>>>>>>>>>INSERTION SORT FUNCTION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 void Insertionsort()
 {
     int avgarray[3] = {0};
@@ -132,7 +265,7 @@ void Insertionsort()
         }
         auto stop = high_resolution_clock::now();                  
         auto duration = duration_cast<microseconds>(stop - start); 
-        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        // cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
         avgarray[k] = duration.count();                                      
 
         for (int t = 0; t < values.size(); t++)
@@ -140,7 +273,8 @@ void Insertionsort()
             nums[t] = copy[t]; 
         }
     }
-    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;  
+    cout<<"Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;  
     cout<<"Average time for Insertion sort : "<<avgtime<<endl; 
      cout<<"-------------------------------------------------"<<endl;
 }
@@ -225,7 +359,7 @@ void mergemain(){
         mergeSort(nums, 0 , n);
         auto stop = high_resolution_clock::now();                  
         auto duration = duration_cast<microseconds>(stop - start); 
-        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        // cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
         avgarray[k] = duration.count();
         for (int t = 0; t < values.size(); t++)
         {                      
@@ -233,6 +367,8 @@ void mergemain(){
         }
     }
     int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+
+    cout<<"Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;
     cout<<"Average time for Merge sort : "<<avgtime<<endl; 
     cout<<"-------------------------------------------------"<<endl;
 
@@ -306,14 +442,15 @@ void quicksortmain(){
         quickSort(nums, 0 , n-1);
         auto stop = high_resolution_clock::now();                  
         auto duration = duration_cast<microseconds>(stop - start); 
-        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        // cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
         avgarray[k] = duration.count(); 
         for (int t = 0; t < values.size(); t++)
         {                      
             nums[t] = copy[t]; 
         }
     }
-    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;  
+    cout<<"Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;  
     cout<<"Average time for Quick sort : "<<avgtime<<endl; 
     cout<<"-------------------------------------------------"<<endl;
 }
@@ -375,14 +512,15 @@ void heapsortmain(){
         heapSort(nums, n);
         auto stop = high_resolution_clock::now();                  
         auto duration = duration_cast<microseconds>(stop - start); 
-        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        // cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
         avgarray[k] = duration.count();  
         for (int t = 0; t < values.size(); t++)
         {                      
             nums[t] = copy[t]; 
         }
     }
-    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3; 
+    cout<<"Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;   
     cout<<"Average time for Heap sort : "<<avgtime<<endl; 
     cout<<"-------------------------------------------------"<<endl;
 }
@@ -426,14 +564,15 @@ void bucketmain(){
         bucketSort(nums, n);
         auto stop = high_resolution_clock::now();                  
         auto duration = duration_cast<microseconds>(stop - start); 
-        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        // cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
         avgarray[k] = duration.count();  
         for (int t = 0; t < values.size(); t++)
         {                      
             nums[t] = copy[t]; 
         }
     }
-    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;
+    cout<<"Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;    
     cout<<"Average time for Bucket sort : "<<avgtime<<endl; 
     cout<<"NOTE : Bucket sort algorithm sorts float values(eg : 0.132,0.870) hence it requrires more time "<<endl;
     cout<<"-------------------------------------------------"<<endl;
@@ -498,7 +637,7 @@ void radixmain(){
         radixsort(nums, n);
         auto stop = high_resolution_clock::now();                  
         auto duration = duration_cast<microseconds>(stop - start); 
-        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        // cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
         avgarray[k] = duration.count();  
         for (int t = 0; t < values.size(); t++)
         {                      
@@ -506,6 +645,7 @@ void radixmain(){
         }
     }
     int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    cout<<"Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;
     cout<<"Average time for Radix sort : "<<avgtime<<endl; 
     cout<<"-------------------------------------------------"<<endl;
 }
@@ -616,14 +756,15 @@ void timmain(){
         timSort(nums, n);
         auto stop = high_resolution_clock::now();                  
         auto duration = duration_cast<microseconds>(stop - start); 
-        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        // cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
         avgarray[k] = duration.count();
         for (int t = 0; t < values.size(); t++)
         {                      
             nums[t] = copy[t]; 
         }
     }
-    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;   
+    cout<<"Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl; 
     cout<<"Average time for Tim sort : "<<avgtime<<endl; 
     cout<<"-------------------------------------------------"<<endl;
 }
@@ -665,14 +806,15 @@ void shellmain(){
         shellSort(nums, n);
         auto stop = high_resolution_clock::now();                  
         auto duration = duration_cast<microseconds>(stop - start); 
-        cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        // cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
         avgarray[k] = duration.count(); 
         for (int t = 0; t < values.size(); t++)
         {                      
             nums[t] = copy[t]; 
         }
     }
-    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;   
+    cout<<"Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl; 
     cout<<"Average time for Shell sort : "<<avgtime<<endl; 
     cout<<"-------------------------------------------------"<<endl;   
 } 
@@ -681,16 +823,18 @@ void shellmain(){
 
 
 
-
+// Setting menu
 void opt3menu(){
-    cout<<"---------------MENU---------------"<<endl;
-    cout<<"1: Back"<<endl;
-    cout<<"2: Change size of Array"<<endl;
-    cout<<"3: Print Array"<<endl;
-    cout<<"4: Edit the Array"<<endl;
-    cout<<"-----------------------------------"<<endl;
-}
 
+    cout<<"|--------------MENU---------------|"<<endl;
+    cout<<"|1: Back                          |"<<endl;
+    cout<<"|2: Change size of Array          |"<<endl;
+    cout<<"|3: Print Array                   |"<<endl;
+    cout<<"|4: Edit the Array                |"<<endl;
+    cout<<"|_________________________________|"<<endl;
+}
+// function handles the execution the of Settings for application
+// handles the array editing
 void opt3menuopt(){
     opt3menu();
     while(true){
@@ -740,6 +884,7 @@ void opt3menuopt(){
 
 }
 
+// function to print list of sorting algorithms
 void opt1menu(){
     cout<<"1: Bubble Sort"<<endl;
     cout<<"2: Selection Sort"<<endl;
@@ -753,6 +898,8 @@ void opt1menu(){
     cout<<"10: Shell Sort"<<endl;
 }
 
+
+// function to select the sorting algorithms to compare
 void opt1menuopt(vector<string>algoptoins ){
     int opt;
 
@@ -781,6 +928,8 @@ void opt1menuopt(vector<string>algoptoins ){
 
 }
 
+
+// function handles the actually sorting by executing each function
 void opt2menu(vector<string> algoptoins){
     cout<<"Starting Comparison....."<<endl;
     cout<<"Comparing : "<<endl;
@@ -790,9 +939,11 @@ void opt2menu(vector<string> algoptoins){
 
     for(int i=0; i<algolist.size(); i++){
         if(algolist[i] == 1){
-            bubbleSort();       //calling bubblesort here
+            bubbleSort(); 
+            parrallelBubbleSort();
         }else if(algolist[i] == 2){
             SelectionSort();
+            parrallelSelectionSort();
         }else if(algolist[i] == 3){
             Insertionsort();
         }else if(algolist[i] == 4){
@@ -820,16 +971,17 @@ void opt2menu(vector<string> algoptoins){
 
 
 void printmenu(){//for priting the menu 
-    cout<<"---------------MENU---------------"<<endl;
-    cout<<"1: Select Algorithms"<<endl;
-    cout<<"2: Compare"<<endl;
-    cout<<"3: Edit the used Array"<<endl;
-    cout<<"4: Get Information"<<endl;
-    cout<<"5: END"<<endl;
-    cout<<"-----------------------------------"<<endl;
+    cout<<"|--------------MENU--------------|"<<endl;
+    cout<<"|1: Select Algorithms            |"<<endl;
+    cout<<"|2: Compare                      |"<<endl;
+    cout<<"|3: Edit the used Array          |"<<endl;
+    cout<<"|4: Get Information              |"<<endl;
+    cout<<"|5: END__________________________|"<<endl;
+    // cout<<"|________________________________|"<<endl;
+    cout<<">"<<endl;
 }
 
-
+// Just a function to print the time complexities of the Sorting algorithm
 void printinfo(){
     cout<<"Average Time complexities of different Sorting techniques"<<endl;
     cout<<"Bubble sort :    O(n2) "<<endl;
@@ -860,9 +1012,8 @@ int main(){
     system("clear");
     printmenu();
 
-
-
-    while(true){//heart-loop
+    // HEART LOOP-handles the execution of application 
+    while(true){
         int opt;
         cout<<"Enter the Option : ";
         cin>>opt;
