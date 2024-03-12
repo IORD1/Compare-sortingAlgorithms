@@ -274,9 +274,11 @@ void Insertionsort()
         }
     }
     int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;  
-    cout<<"Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;  
-    cout<<"Average time for Insertion sort : "<<avgtime<<endl; 
-     cout<<"-------------------------------------------------"<<endl;
+    cout<<"--------------------------------------------------"<<endl;  
+    cout<<"SELECTION SORT-----------------------------------|"<<endl;
+    cout<<"|Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;
+    cout<<"|Average time : "<<avgtime<<endl;                   
+    cout<<"|________________________________________________|"<<endl;
 }
 
 
@@ -340,6 +342,86 @@ void mergeSort(int array[], int const begin, int const end)
 
 }
 
+void parrallelMerge(int * X, int n, int * tmp) {
+   int i = 0;
+   int j = n/2;
+   int ti = 0;
+	//i will iterate till first  half anf J will iterate for 2nd half of array
+   while (i<n/2 && j<n) {
+      if (X[i] < X[j]) {
+         tmp[ti] = X[i];
+         ti++; i++;
+      } else {
+         tmp[ti] = X[j];
+         ti++; 
+	 j++;
+      }
+   }
+   while (i<n/2) { /* finish up lower half */
+      tmp[ti] = X[i];
+	ti++;
+	i++;
+   }
+      while (j<n) { /* finish up upper half */
+         tmp[ti] = X[j];
+         ti++; 
+	 j++;
+   }
+	//Copy sorted array tmp back to  X (Original array)
+   memcpy(X, tmp, n*sizeof(int));
+
+} 
+
+void parallelMergesort(int * X, int n, int * tmp)
+{
+   if (n < 2) return;
+
+   #pragma omp task firstprivate (X, n, tmp)
+   parallelMergesort(X, n/2, tmp);
+
+   #pragma omp task firstprivate (X, n, tmp)
+   parallelMergesort(X+(n/2), n-(n/2), tmp);
+	
+   //Wait for both paralel tasks to complete execution
+   #pragma omp taskwait
+
+    /* merge sorted halves into sorted list */
+   parrallelMerge(X, n, tmp);
+}
+
+
+void parallelMergeSortMain(){
+    int avgarray[3] = {0};
+    int nums[values.size()] = {0};
+    int copy[values.size()] = {0};
+    int tmp[values.size()];
+    for (int d = 0; d < values.size(); d++)
+    {
+        nums[d] = values[d];
+        copy[d] = values[d];
+    }
+
+    int n = values.size();
+    for (int k = 0; k < 3; k++)
+    {
+        auto start = high_resolution_clock::now();
+        parallelMergesort(nums,n,tmp);
+        auto stop = high_resolution_clock::now();                  
+        auto duration = duration_cast<microseconds>(stop - start); 
+        // cout << "Time taken by function: " << duration.count() << " microseconds" << endl; 
+        avgarray[k] = duration.count();
+        for (int t = 0; t < values.size(); t++)
+        {                      
+            nums[t] = copy[t]; 
+        }
+    }
+    int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;   
+    cout<<"MERGE SORT PARRALLEL                             |"<<endl;
+    cout<<"|Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;
+    cout<<"|Average time : "<<avgtime<<endl;                   
+    cout<<"|________________________________________________|"<<endl;
+}
+
 
 void mergemain(){
 
@@ -367,10 +449,11 @@ void mergemain(){
         }
     }
     int avgtime = (avgarray[0] + avgarray[1] + avgarray[2])/3;    
-
-    cout<<"Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;
-    cout<<"Average time for Merge sort : "<<avgtime<<endl; 
-    cout<<"-------------------------------------------------"<<endl;
+    cout<<"--------------------------------------------------"<<endl;  
+    cout<<"MERGE SORT---------------------------------------|"<<endl;
+    cout<<"|Time Taken : "<<avgarray[0]<<", "<<avgarray[1]<<", "<<avgarray[2]<<endl;
+    cout<<"|Average time : "<<avgtime<<endl;                   
+    cout<<"|                                                |"<<endl;
 
 }
 
@@ -948,6 +1031,7 @@ void opt2menu(vector<string> algoptoins){
             Insertionsort();
         }else if(algolist[i] == 4){
             mergemain();
+            parallelMergeSortMain();
         }else if(algolist[i] == 5){
             quicksortmain();
         }else if(algolist[i] == 6){
@@ -969,8 +1053,8 @@ void opt2menu(vector<string> algoptoins){
 }
 
 
-
-void printmenu(){//for priting the menu 
+//for MAIN MENU 
+void printmenu(){
     cout<<"|--------------MENU--------------|"<<endl;
     cout<<"|1: Select Algorithms            |"<<endl;
     cout<<"|2: Compare                      |"<<endl;
